@@ -1,0 +1,89 @@
+实验二：交换机逻辑配置模板
+===========================
+
+说明
+----
+1. 本文件描述厂商中立的配置意图，不是可直接复制的特定品牌命令。
+2. 实施时请按实际设备语法转换，并先备份配置、确认 Console/带外管理方式。
+3. 所有 Trunk 仅允许指定业务 VLAN；管理 VLAN 与本征 VLAN 应按现场安全规范另行规划。
+4. 原 16 口 10Base-T Hub 不再参与升级后的网络。
+
+[SW1：开发室 1，24 GE 电口 + SFP]
+DEVICE ROLE = central-access-switch
+VLAN 10 NAME = DEV_ROOM_1
+VLAN 20 NAME = DEV_ROOM_2_TRANSIT
+VLAN 30 NAME = MANUFACTURING_TRANSIT
+
+PORT GE1/0/1-GE1/0/10
+  MODE = access
+  ACCESS_VLAN = 10
+  DESCRIPTION = DEV_ROOM_1_PC_01_TO_10
+
+PORT GE1/0/11
+  MODE = trunk
+  ALLOWED_VLAN = 20
+  PEER = SW2 GE0/11
+  MEDIA = Cat6_1000BASE-T
+
+PORT GE1/0/12
+  MODE = trunk
+  ALLOWED_VLAN = 10,20,30
+  PEER = ROUTER GE0/1
+  MEDIA = Cat6_1000BASE-T
+
+PORT SFP1/0/25
+  MODE = trunk
+  ALLOWED_VLAN = 30
+  PEER = SW3 SFP0/17
+  MEDIA = OS2_1000BASE-LX
+
+PORT GE1/0/13-GE1/0/24
+  STATE = disabled_until_needed
+  DESCRIPTION = reserved_copper_ports
+
+[SW2：开发室 2，16 GE 电口]
+DEVICE ROLE = room-access-switch
+VLAN 20 NAME = DEV_ROOM_2
+
+PORT GE0/1-GE0/10
+  MODE = access
+  ACCESS_VLAN = 20
+  DESCRIPTION = DEV_ROOM_2_PC_01_TO_10
+
+PORT GE0/11
+  MODE = trunk
+  ALLOWED_VLAN = 20
+  PEER = SW1 GE1/0/11
+  MEDIA = Cat6_1000BASE-T
+
+PORT GE0/12-GE0/16
+  STATE = disabled_until_needed
+  DESCRIPTION = reserved_copper_ports
+
+[SW3：制造部，16 GE 电口 + SFP]
+DEVICE ROLE = department-access-switch
+VLAN 30 NAME = MANUFACTURING
+
+PORT GE0/1-GE0/10
+  MODE = access
+  ACCESS_VLAN = 30
+  DESCRIPTION = MANUFACTURING_PC_01_TO_10
+
+PORT SFP0/17
+  MODE = trunk
+  ALLOWED_VLAN = 30
+  PEER = SW1 SFP1/0/25
+  MEDIA = OS2_1000BASE-LX
+
+PORT GE0/11-GE0/16
+  STATE = disabled_until_needed
+  DESCRIPTION = reserved_copper_ports
+
+实施核对
+--------
+- 三个区域的 PC 接入口均为 Access，且 VLAN 与报告一致。
+- SW1-SW2 两端均仅允许 VLAN 20。
+- SW1-SW3 两端均仅允许 VLAN 30。
+- SW1-Router 两端均仅允许 VLAN 10、20、30。
+- 两台交换机互联端口的速度、双工和 Trunk 参数一致。
+- 1000BASE-LX 模块与 OS2 单模光纤匹配，收发光功率处于设备允许范围。

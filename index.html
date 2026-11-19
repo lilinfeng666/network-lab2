@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="《计算机网络》实验二：简单局域网升级设计，包含拓扑、线缆与设备选型、VLAN 划分、IP 地址规划、单臂路由及 Internet 接入。">
+  <meta name="theme-color" content="#102a43">
+  <title>实验二 · 简单网络的设计</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102a43'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='25' font-weight='700' fill='%23ffffff'%3EN/2%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="#overview" aria-label="返回实验二首页">
+        <span class="brand-mark" aria-hidden="true">N<span>/</span>2</span>
+        <span><strong>网络设计实验</strong><small>NETWORK DESIGN LAB</small></span>
+      </a>
+      <nav aria-label="页面导航">
+        <a href="#topology">网络拓扑</a>
+        <a href="#equipment">设备与布线</a>
+        <a href="#addressing">VLAN 规划</a>
+        <a href="#verification">验证与文档</a>
+      </nav>
+      <a class="nav-report" href="docs/report.md">实验报告 <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="overview" data-section>
+      <div class="hero-grid page-shell">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> 计算机网络 · 实验二</p>
+          <h1>简单网络的设计<span>从 10Base-T 到可管理的交换网络</span></h1>
+          <p class="hero-lead">连接开发室 1、开发室 2 与制造部的 30 台终端，以三个 VLAN 隔离广播域，用单臂路由实现互通，并在给定的 <code>172.18.18.128/26</code> 内完成无重叠地址规划。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#topology">查看升级拓扑 <span aria-hidden="true">↓</span></a>
+            <a class="button button-ghost" href="docs/report.md">阅读完整报告 <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="网络结构摘要">
+          <div class="visual-topline"><span>TOPOLOGY / 01</span><span class="status-dot">设计方案</span></div>
+          <div class="mini-network" aria-hidden="true">
+            <div class="mini-cloud">INTERNET</div>
+            <div class="mini-line vertical"></div>
+            <div class="mini-router">R<span>路由 · NAT</span></div>
+            <div class="mini-line vertical"></div>
+            <div class="mini-core">SW1<span>开发室 1 · VLAN 10</span></div>
+            <div class="mini-branches"><i></i><i></i></div>
+            <div class="mini-nodes">
+              <div><b>SW2</b><span>开发室 2</span><small>50 m / Cat6</small></div>
+              <div><b>SW3</b><span>制造部</span><small>500 m / OS2</small></div>
+            </div>
+          </div>
+          <div class="visual-foot"><span>802.1Q</span><span>1000BASE-LX</span><span>NAT / PAT</span></div>
+        </div>
+      </div>
+      <div class="hero-stats page-shell" aria-label="设计关键指标">
+        <div><strong>30</strong><span>台 PC 接入</span></div>
+        <div><strong>3</strong><span>个业务 VLAN</span></div>
+        <div><strong>/28</strong><span>等长子网划分</span></div>
+        <div><strong>1</strong><span>个保留扩展网段</span></div>
+      </div>
+    </section>
+
+    <section class="section page-shell" aria-labelledby="brief-title">
+      <div class="section-heading compact">
+        <div><p class="section-index">00 / 设计任务</p><h2 id="brief-title">从现状出发，而不是重画一张网</h2></div>
+        <p>保留合理的星型布线思路，替换共享式 Hub，针对距离与业务隔离需求完成升级。</p>
+      </div>
+      <div class="brief-grid">
+        <article class="brief-card before">
+          <p class="card-kicker">现有条件</p>
+          <h3>10Base-T 共享网络</h3>
+          <ul class="check-list">
+            <li><span>01</span>开发室 1 已有 10 台 PC 与 16 口 Hub</li>
+            <li><span>02</span>新增开发室 2，10 台 PC，同层距离 50 m</li>
+            <li><span>03</span>制造部 10 台 PC，楼间距离 500 m</li>
+          </ul>
+        </article>
+        <article class="brief-card after">
+          <p class="card-kicker">升级结果</p>
+          <h3>可管理、可隔离、可扩展</h3>
+          <ul class="check-list">
+            <li><span>01</span>三台管理型交换机替换共享式接入</li>
+            <li><span>02</span>Cat6 与单模光纤匹配不同传输距离</li>
+            <li><span>03</span>VLAN 10 / 20 / 30 + 单臂路由 + NAT</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-tinted" id="topology" data-section>
+      <div class="page-shell">
+        <div class="section-heading">
+          <div><p class="section-index">01 / 网络拓扑</p><h2>以开发室 1 为中心的星型结构</h2></div>
+          <p>开发室 2 通过 50 m 铜缆上联，制造部通过 500 m 单模光纤上联。路由器放在中心机柜，用一个 Trunk 口承载三个 VLAN。</p>
+        </div>
+        <div class="topology-frame">
+          <div class="topology-toolbar">
+            <span><i class="legend-dot copper"></i>楼内铜缆 <i class="legend-dot fiber"></i>楼间光纤 <i class="legend-dot trunk"></i>VLAN Trunk</span>
+            <a href="assets/topology.svg" download>下载 SVG 拓扑 <span aria-hidden="true">↓</span></a>
+          </div>
+          <object class="topology-object" data="assets/topology.svg" type="image/svg+xml" aria-label="升级后的完整网络拓扑图">
+            <p>浏览器无法显示 SVG，请<a href="assets/topology.svg">打开拓扑图</a>。</p>
+          </object>
+        </div>
+        <div class="design-notes">
+          <article><span>01</span><h3>终端接入</h3><p>PC 接入口设为对应 VLAN 的 Access 口，终端无需感知 VLAN 标签。</p></article>
+          <article><span>02</span><h3>最小 Trunk</h3><p>开发室 2 仅放行 VLAN 20，制造部仅放行 VLAN 30，减少无关流量。</p></article>
+          <article><span>03</span><h3>集中路由</h3><p>路由器子接口作为网关，避免额外传输网段，保留第四个 /28。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="equipment" data-section aria-labelledby="equipment-title">
+      <div class="section-heading">
+        <div><p class="section-index">02 / 设备与布线</p><h2 id="equipment-title">每一种介质，都有明确的距离依据</h2></div>
+        <p>楼内铜缆遵循 100 m 信道限制；楼间使用光纤解决 500 m 距离、电磁干扰和地电位差问题。</p>
+      </div>
+      <div class="media-grid">
+        <article class="media-card copper-card">
+          <div class="media-number">50<small>m</small></div>
+          <p class="card-kicker">开发室 1 ↔ 开发室 2</p>
+          <h3>Cat6 U/UTP</h3>
+          <p>同层短距离使用千兆铜缆。永久链路不超过 90 m，包含跳线的完整信道不超过 100 m。</p>
+          <span class="technical-tag">1000BASE-T</span>
+        </article>
+        <article class="media-card fiber-card">
+          <div class="media-number">500<small>m</small></div>
+          <p class="card-kicker">开发部大楼 ↔ 制造部大楼</p>
+          <h3>OS2 单模光纤</h3>
+          <p>两端各配置一只匹配的 1000BASE-LX SFP；室外段选用铠装光缆并配置终端盒、尾纤和跳纤。</p>
+          <span class="technical-tag">1000BASE-LX</span>
+        </article>
+      </div>
+
+      <div class="table-block">
+        <div class="table-title"><h3>新增设备与端口预算</h3><span>原 16 口 Hub 退出使用</span></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="新增设备与端口预算表，可横向滚动">
+          <table>
+            <thead><tr><th>设备 / 位置</th><th>最低配置</th><th>端口使用</th><th>余量</th></tr></thead>
+            <tbody>
+              <tr><td><strong>SW1</strong><small>开发室 1 机柜</small></td><td>24 GE 电口 + 1 SFP</td><td>10 PC + SW2 + 路由器；1 SFP 接 SW3</td><td>12 个电口</td></tr>
+              <tr><td><strong>SW2</strong><small>开发室 2</small></td><td>16 GE 电口</td><td>10 PC + 1 个上联口</td><td>5 个电口</td></tr>
+              <tr><td><strong>SW3</strong><small>制造部</small></td><td>16 GE 电口 + 1 SFP</td><td>10 PC；1 SFP 上联 SW1</td><td>6 个电口</td></tr>
+              <tr><td><strong>路由器 / 防火墙</strong><small>开发室 1 机柜</small></td><td>2 GE，支持 802.1Q / NAT / ACL</td><td>1 LAN Trunk + 1 WAN</td><td>按业务扩展</td></tr>
+              <tr><td><strong>单模 SFP</strong><small>SW1 与 SW3</small></td><td>2 × 1000BASE-LX</td><td>两端各 1 只</td><td>参数须匹配</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details class="port-details">
+        <summary>查看完整端口映射 <span aria-hidden="true">+</span></summary>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="交换机端口映射表，可横向滚动">
+          <table>
+            <thead><tr><th>设备</th><th>端口</th><th>连接对象</th><th>模式与 VLAN</th></tr></thead>
+            <tbody>
+              <tr><td>SW1</td><td>GE1/0/1–10</td><td>开发室 1 的 10 台 PC</td><td>Access VLAN 10</td></tr>
+              <tr><td>SW1</td><td>GE1/0/11</td><td>SW2 GE0/11</td><td>Trunk，仅 VLAN 20</td></tr>
+              <tr><td>SW1</td><td>GE1/0/12</td><td>路由器 GE0/1</td><td>Trunk，VLAN 10 / 20 / 30</td></tr>
+              <tr><td>SW1</td><td>SFP1/0/25</td><td>SW3 SFP0/17</td><td>Trunk，仅 VLAN 30</td></tr>
+              <tr><td>SW2</td><td>GE0/1–10</td><td>开发室 2 的 10 台 PC</td><td>Access VLAN 20</td></tr>
+              <tr><td>SW2</td><td>GE0/11</td><td>SW1 GE1/0/11</td><td>Trunk，仅 VLAN 20</td></tr>
+              <tr><td>SW3</td><td>GE0/1–10</td><td>制造部的 10 台 PC</td><td>Access VLAN 30</td></tr>
+              <tr><td>SW3</td><td>SFP0/17</td><td>SW1 SFP1/0/25</td><td>Trunk，仅 VLAN 30</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="section section-dark" id="addressing" data-section aria-labelledby="addressing-title">
+      <div class="page-shell">
+        <div class="section-heading inverse">
+          <div><p class="section-index">03 / VLAN 与 IP</p><h2 id="addressing-title">一个 /26，恰好装入四个 /28</h2></div>
+          <p>每个 /28 有 14 个可用地址，容纳 1 个网关、10 台 PC 和 3 个备用地址。使用三个网段，第四个留作扩展。</p>
+        </div>
+        <div class="subnet-equation" aria-label="子网划分计算">
+          <div><small>原始地址块</small><strong>172.18.18.128<em>/26</em></strong><span>64 个地址 · .128–.191</span></div>
+          <span class="equation-arrow" aria-hidden="true">→</span>
+          <div><small>等长划分</small><strong>4 × <em>/28</em></strong><span>每段 16 个地址</span></div>
+          <span class="equation-arrow" aria-hidden="true">→</span>
+          <div><small>每段可用</small><strong>14<em> HOSTS</em></strong><span>网关 1 + PC 10 + 备用 3</span></div>
+        </div>
+
+        <div class="filter-panel">
+          <div class="filter-buttons" role="group" aria-label="按 VLAN 筛选地址表">
+            <button type="button" data-filter="all" aria-pressed="true">全部网段</button>
+            <button type="button" data-filter="10" aria-pressed="false">VLAN 10</button>
+            <button type="button" data-filter="20" aria-pressed="false">VLAN 20</button>
+            <button type="button" data-filter="30" aria-pressed="false">VLAN 30</button>
+            <button type="button" data-filter="reserved" aria-pressed="false">保留网段</button>
+          </div>
+          <p class="filter-status" aria-live="polite">显示 4 个网段</p>
+        </div>
+        <div class="table-scroll dark-table" tabindex="0" role="region" aria-label="VLAN 与 IP 地址规划表，可横向滚动">
+          <table>
+            <thead><tr><th>VLAN / 区域</th><th>网络地址</th><th>网关</th><th>10 台 PC 地址</th><th>广播地址</th><th>备用地址</th></tr></thead>
+            <tbody>
+              <tr data-vlan-row="10"><td><span class="vlan-badge vlan-10">VLAN 10</span><strong>开发室 1</strong></td><td><code>172.18.18.128/28</code></td><td><code>.129</code></td><td><code>.130–.139</code></td><td><code>.143</code></td><td><code>.140–.142</code></td></tr>
+              <tr data-vlan-row="20"><td><span class="vlan-badge vlan-20">VLAN 20</span><strong>开发室 2</strong></td><td><code>172.18.18.144/28</code></td><td><code>.145</code></td><td><code>.146–.155</code></td><td><code>.159</code></td><td><code>.156–.158</code></td></tr>
+              <tr data-vlan-row="30"><td><span class="vlan-badge vlan-30">VLAN 30</span><strong>制造部</strong></td><td><code>172.18.18.160/28</code></td><td><code>.161</code></td><td><code>.162–.171</code></td><td><code>.175</code></td><td><code>.172–.174</code></td></tr>
+              <tr data-vlan-row="reserved"><td><span class="vlan-badge vlan-reserved">保留</span><strong>未来扩展</strong></td><td><code>172.18.18.176/28</code></td><td>未分配</td><td>未分配</td><td><code>.191</code></td><td><code>.177–.190</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-caption">所有业务子网掩码均为 <code>255.255.255.240</code>。表内以点号开头的地址均继承所在网段的 <code>172.18.18</code> 前缀。</p>
+
+        <div class="vlan-cards">
+          <article class="vlan-card vlan-card-10">
+            <div class="vlan-card-head"><span>VLAN 10</span><small>开发室 1</small></div>
+            <h3>172.18.18.128/28</h3>
+            <dl><div><dt>默认网关</dt><dd>172.18.18.129</dd></div><div><dt>PC-01 → PC-10</dt><dd>.130 → .139</dd></div><div><dt>网络 / 广播</dt><dd>.128 / .143</dd></div></dl>
+          </article>
+          <article class="vlan-card vlan-card-20">
+            <div class="vlan-card-head"><span>VLAN 20</span><small>开发室 2</small></div>
+            <h3>172.18.18.144/28</h3>
+            <dl><div><dt>默认网关</dt><dd>172.18.18.145</dd></div><div><dt>PC-01 → PC-10</dt><dd>.146 → .155</dd></div><div><dt>网络 / 广播</dt><dd>.144 / .159</dd></div></dl>
+          </article>
+          <article class="vlan-card vlan-card-30">
+            <div class="vlan-card-head"><span>VLAN 30</span><small>制造部</small></div>
+            <h3>172.18.18.160/28</h3>
+            <dl><div><dt>默认网关</dt><dd>172.18.18.161</dd></div><div><dt>PC-01 → PC-10</dt><dd>.162 → .171</dd></div><div><dt>网络 / 广播</dt><dd>.160 / .175</dd></div></dl>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" aria-labelledby="routing-title">
+      <div class="section-heading">
+        <div><p class="section-index">04 / 路由与 Internet</p><h2 id="routing-title">一个 LAN 口，承担三个 VLAN 的网关</h2></div>
+        <p>单臂路由避免额外占用传输子网；WAN 参数由运营商提供，内网三个业务网段统一执行源 NAT/PAT。</p>
+      </div>
+      <ol class="flow-steps">
+        <li><span>01</span><div><h3>终端发往网关</h3><p>源 PC 判断目标跨网段，将帧发送到所属 VLAN 的路由器子接口。</p></div></li>
+        <li><span>02</span><div><h3>Trunk 携带标签</h3><p>SW1 与路由器之间仅放行 VLAN 10、20、30，保持二层隔离。</p></div></li>
+        <li><span>03</span><div><h3>查表并转发</h3><p>三个业务网段为直连路由；其他目的网络使用运营商默认路由。</p></div></li>
+        <li><span>04</span><div><h3>NAT 访问公网</h3><p>出站私有源地址转换为 WAN 地址，返回流量按 NAT 会话转回内网。</p></div></li>
+      </ol>
+      <div class="config-grid">
+        <article class="config-card">
+          <div class="config-title"><span>SW</span><div><h3>交换机配置模板</h3><p>Access / Trunk / allowed VLAN</p></div></div>
+          <pre><code>SW1 GE1/0/1–10   ACCESS VLAN 10
+SW1 GE1/0/11     TRUNK ALLOW 20
+SW1 GE1/0/12     TRUNK ALLOW 10,20,30
+SW1 SFP1/0/25    TRUNK ALLOW 30</code></pre>
+          <a href="config/switches.txt" download>下载交换机配置 <span aria-hidden="true">↓</span></a>
+        </article>
+        <article class="config-card">
+          <div class="config-title"><span>R</span><div><h3>路由器配置模板</h3><p>子接口 / 默认路由 / NAT</p></div></div>
+          <pre><code>VLAN 10  GE0/1.10  172.18.18.129/28
+VLAN 20  GE0/1.20  172.18.18.145/28
+VLAN 30  GE0/1.30  172.18.18.161/28
+DEFAULT  VIA &lt;ISP_NEXT_HOP&gt;</code></pre>
+          <a href="config/router.txt" download>下载路由器配置 <span aria-hidden="true">↓</span></a>
+        </article>
+      </div>
+      <p class="config-note">配置文件为厂商中立的逻辑模板，实施时须按实际设备语法转换。WAN 地址、运营商下一跳和 DNS 不使用虚构值。</p>
+    </section>
+
+    <section class="section section-tinted" aria-labelledby="issues-title">
+      <div class="page-shell issues-layout">
+        <div class="issues-intro">
+          <p class="section-index">05 / 问题与解决</p>
+          <h2 id="issues-title">设计中的关键取舍</h2>
+          <p>实验要求记录问题与解决办法。这里记录方案设计过程中可复现的约束分析，不冒充真实设备故障。</p>
+        </div>
+        <div class="accordion-list">
+          <details open><summary>为什么不能直接沿用原 Hub？<span aria-hidden="true">+</span></summary><p>Hub 在物理层重复转发信号，所有端口共享冲突域，不能识别 802.1Q 标签。升级后以管理型交换机的 Access 与 Trunk 端口实现 VLAN。</p></details>
+          <details><summary>为什么 500 m 链路必须使用光纤？<span aria-hidden="true">+</span></summary><p>铜缆以太网信道通常限制为 100 m。OS2 单模光纤不仅满足 500 m 距离，也能降低工业电磁干扰、雷击和楼间地电位差的影响。</p></details>
+          <details><summary>为什么不划分三个 /27？<span aria-hidden="true">+</span></summary><p>一个 /26 只有 64 个地址，而三个 /27 共需 96 个地址。每个区域只需 10 台 PC 加 1 个网关，因此 /28 足够，且能得到三个业务网段和一个保留网段。</p></details>
+          <details><summary>为什么选择单臂路由？<span aria-hidden="true">+</span></summary><p>路由器 VLAN 子接口直接作为三个业务网关，无需再为三层交换机到路由器设置独立传输网段，可完整保留 172.18.18.176/28。</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="verification" data-section aria-labelledby="verification-title">
+      <div class="section-heading">
+        <div><p class="section-index">06 / 验证与交付</p><h2 id="verification-title">设计结论与上机验证分开记录</h2></div>
+        <p>地址与配置一致性已完成静态检查；硬件、光功率、NAT 会话和实际连通性须在真实设备或仿真环境验证。</p>
+      </div>
+      <div class="verification-grid">
+        <article class="verification-card passed">
+          <p class="card-kicker">已完成 · 静态检查</p>
+          <ul>
+            <li>三个 /28 均位于原 /26 内且互不重叠</li>
+            <li>每个业务网段恰好分配 10 个 PC 地址</li>
+            <li>拓扑、报告与配置中的 VLAN / 网关一致</li>
+            <li>172.18.18.176/28 完整保留</li>
+          </ul>
+        </article>
+        <article class="verification-card pending">
+          <p class="card-kicker">待上机 · 实际验证</p>
+          <ul>
+            <li>同 VLAN、网关与跨 VLAN 的 ping 测试</li>
+            <li>Trunk allowed VLAN 与接口状态检查</li>
+            <li>默认路由、NAT 会话和 Internet 访问</li>
+            <li>铜缆认证、光功率与接口误码检查</li>
+          </ul>
+        </article>
+      </div>
+      <div class="document-banner">
+        <div><p class="card-kicker">完整实验材料</p><h2>报告、拓扑、配置与运行说明</h2><p>所有内容均包含在项目源码中，可下载、打印或继续编辑。</p></div>
+        <div class="document-links">
+          <a href="docs/report.md"><span>01</span>实验报告 <b aria-hidden="true">↗</b></a>
+          <a href="assets/topology.svg" download><span>02</span>拓扑 SVG <b aria-hidden="true">↓</b></a>
+          <a href="README.md"><span>03</span>README <b aria-hidden="true">↗</b></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="page-shell">
+      <div><strong>实验二 · 简单网络的设计</strong><p>景德镇陶瓷大学 信息工程学院 · 计算机网络</p></div>
+      <p>静态设计校验完成 · 实际上机结果待验证</p>
+    </div>
+  </footer>
+</body>
+</html>

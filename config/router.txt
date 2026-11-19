@@ -1,0 +1,88 @@
+实验二：路由器/防火墙逻辑配置模板
+=================================
+
+说明
+----
+1. 本文件描述厂商中立的配置意图，不是可直接复制的特定品牌命令。
+2. WAN 地址、运营商下一跳和 DNS 均为现场参数，不得使用虚构值替代。
+3. LAN 使用 802.1Q 子接口进行单臂路由；三个业务网关均属于原 172.18.18.128/26。
+4. 部署前备份配置，并在维护窗口内变更；管理访问仅开放给受信任管理网段。
+
+[物理接口]
+INTERFACE GE0/0
+  ROLE = WAN
+  ADDRESS = <ISP_ASSIGNED_ADDRESS>
+  PEER = <ISP_ONT_OR_HANDOFF>
+
+INTERFACE GE0/1
+  ROLE = LAN_TRUNK
+  PEER = SW1 GE1/0/12
+  UNTAGGED_TRAFFIC = disabled
+  ALLOWED_VLAN = 10,20,30
+
+[VLAN 子接口与网关]
+SUBINTERFACE GE0/1 VLAN 10
+  NAME = DEV_ROOM_1_GATEWAY
+  IPV4 = 172.18.18.129
+  PREFIX = 28
+  CONNECTED_NETWORK = 172.18.18.128/28
+
+SUBINTERFACE GE0/1 VLAN 20
+  NAME = DEV_ROOM_2_GATEWAY
+  IPV4 = 172.18.18.145
+  PREFIX = 28
+  CONNECTED_NETWORK = 172.18.18.144/28
+
+SUBINTERFACE GE0/1 VLAN 30
+  NAME = MANUFACTURING_GATEWAY
+  IPV4 = 172.18.18.161
+  PREFIX = 28
+  CONNECTED_NETWORK = 172.18.18.160/28
+
+[路由]
+ROUTE 172.18.18.128/28 VIA directly_connected VLAN10
+ROUTE 172.18.18.144/28 VIA directly_connected VLAN20
+ROUTE 172.18.18.160/28 VIA directly_connected VLAN30
+ROUTE 0.0.0.0/0 VIA <ISP_NEXT_HOP> OUT GE0/0
+DNS = <ISP_OR_INTERNAL_DNS>
+
+[源 NAT/PAT]
+NAT INSIDE_NETWORKS = 172.18.18.128/28,172.18.18.144/28,172.18.18.160/28
+NAT OUTSIDE_INTERFACE = GE0/0
+NAT ACTION = source_overload_to_WAN_address
+NAT DIRECTION = inside_to_outside_only
+
+[基础安全策略]
+POLICY INTER_VLAN
+  DEFAULT = permit_for_lab_verification
+  NOTE = 验证互通后按实际业务最小化允许范围
+
+POLICY LAN_TO_WAN
+  ALLOW = established_internal_sessions_and_NAT
+  DNS = allow_to_approved_resolvers
+  ADMINISTRATION_FROM_WAN = deny
+
+ACL VLAN10_INGRESS_ANTISPOOF
+  PERMIT SOURCE = 172.18.18.128/28
+  DENY SOURCE = any_other LOG = true
+
+ACL VLAN20_INGRESS_ANTISPOOF
+  PERMIT SOURCE = 172.18.18.144/28
+  DENY SOURCE = any_other LOG = true
+
+ACL VLAN30_INGRESS_ANTISPOOF
+  PERMIT SOURCE = 172.18.18.160/28
+  DENY SOURCE = any_other LOG = true
+
+[终端参数]
+VLAN10 PC: IP=172.18.18.130-139 PREFIX=28 GATEWAY=172.18.18.129
+VLAN20 PC: IP=172.18.18.146-155 PREFIX=28 GATEWAY=172.18.18.145
+VLAN30 PC: IP=172.18.18.162-171 PREFIX=28 GATEWAY=172.18.18.161
+
+实施核对
+--------
+- 三个子接口的 VLAN ID、IP 和掩码与终端默认网关一致。
+- 原地址块中的 172.18.18.176/28 未被任何接口或传输链路占用。
+- 默认路由只指向真实运营商下一跳。
+- NAT 仅覆盖三个业务网段，WAN 入站管理默认关闭。
+- 保存配置后依次验证网关、跨 VLAN、默认路由、NAT 会话与 Internet。

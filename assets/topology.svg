@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040" role="img" aria-labelledby="title desc">
+  <title id="title">实验二升级后的局域网拓扑图</title>
+  <desc id="desc">互联网经运营商 ONT 和路由器连接开发室一中心交换机，开发室二通过五十米 Cat6 铜缆上联，制造部通过五百米单模光纤上联。三个区域各有十台电脑，分别属于 VLAN 10、20、30。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#eef4f8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#15304a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/>
+    </marker>
+    <symbol id="pc" viewBox="0 0 42 38">
+      <rect x="4" y="2" width="34" height="24" rx="3" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <rect x="8" y="6" width="26" height="15" rx="1" fill="currentColor" opacity="0.13"/>
+      <path d="M18 27v5m-7 2h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="switch" viewBox="0 0 180 64">
+      <rect x="1" y="1" width="178" height="62" rx="12" fill="#152d43"/>
+      <path d="M20 24h28m-7-7 7 7-7 7m99-7h-28m7-7-7 7 7 7" fill="none" stroke="#77d6c2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <g fill="#d6e6ef">
+        <rect x="20" y="43" width="12" height="7" rx="1"/><rect x="38" y="43" width="12" height="7" rx="1"/>
+        <rect x="56" y="43" width="12" height="7" rx="1"/><rect x="74" y="43" width="12" height="7" rx="1"/>
+        <rect x="92" y="43" width="12" height="7" rx="1"/><rect x="110" y="43" width="12" height="7" rx="1"/>
+        <rect x="128" y="43" width="12" height="7" rx="1"/><rect x="146" y="43" width="12" height="7" rx="1"/>
+      </g>
+    </symbol>
+    <style>
+      text { font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #183047; }
+      .muted { fill: #5d7284; }
+      .small { font-size: 15px; }
+      .label { font-size: 17px; font-weight: 600; }
+      .card { fill: #fff; stroke: #d9e5ec; stroke-width: 1.5; }
+      .copper { stroke: #3e7cb1; stroke-width: 4; fill: none; }
+      .fiber { stroke: #d97706; stroke-width: 5; fill: none; }
+      .trunk { stroke: #7254b3; stroke-width: 4; fill: none; }
+      .wan { stroke: #64748b; stroke-width: 3; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="1040" fill="url(#bg)"/>
+  <text x="64" y="64" font-size="30" font-weight="700">简单网络升级拓扑</text>
+  <text x="64" y="96" font-size="16" class="muted">30 台终端 · 3 个业务 VLAN · 星型交换 · 单臂路由 · NAT 上网</text>
+  <g transform="translate(1070 50)">
+    <rect width="300" height="62" rx="14" fill="#fff" stroke="#d9e5ec"/>
+    <circle cx="24" cy="22" r="5" fill="#3e7cb1"/><text x="38" y="28" class="small">Cat6 铜缆</text>
+    <circle cx="156" cy="22" r="5" fill="#d97706"/><text x="170" y="28" class="small">OS2 单模光纤</text>
+    <circle cx="24" cy="45" r="5" fill="#7254b3"/><text x="38" y="51" class="small">802.1Q Trunk</text>
+    <circle cx="156" cy="45" r="5" fill="#64748b"/><text x="170" y="51" class="small">运营商线路</text>
+  </g>
+
+  <!-- Internet and WAN -->
+  <g filter="url(#shadow)">
+    <path d="M625 212c-34 0-56-19-56-44 0-24 20-41 45-43 8-35 39-55 73-50 24-27 68-29 94-5 35-7 68 14 73 46 28 3 48 22 48 47 0 27-23 49-55 49z" fill="#fff" stroke="#9db3c3" stroke-width="2"/>
+    <text x="736" y="151" text-anchor="middle" font-size="24" font-weight="700">Internet</text>
+    <text x="736" y="178" text-anchor="middle" class="small muted">运营商网络</text>
+  </g>
+  <path d="M736 213v46" class="wan" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)">
+    <rect x="650" y="260" width="172" height="62" rx="13" class="card"/>
+    <text x="736" y="286" text-anchor="middle" class="label">运营商 ONT</text>
+    <text x="736" y="307" text-anchor="middle" class="small muted">按交付接口选配</text>
+  </g>
+  <path d="M736 322v43" class="wan" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)">
+    <rect x="614" y="365" width="244" height="82" rx="16" fill="#fff" stroke="#7254b3" stroke-width="2"/>
+    <text x="736" y="393" text-anchor="middle" font-size="20" font-weight="700">路由器 / 防火墙</text>
+    <text x="736" y="418" text-anchor="middle" class="small">VLAN 子接口 · 默认路由 · NAT</text>
+    <text x="736" y="437" text-anchor="middle" class="small muted">安装于开发室 1 机柜</text>
+  </g>
+  <path d="M736 447v62" class="trunk"/>
+  <rect x="751" y="465" width="215" height="29" rx="8" fill="#f1ebfa"/>
+  <text x="858" y="485" text-anchor="middle" class="small" fill="#5d3f98">Trunk：VLAN 10, 20, 30</text>
+
+  <!-- Center switch -->
+  <g filter="url(#shadow)">
+    <rect x="522" y="509" width="428" height="124" rx="20" class="card"/>
+    <use href="#switch" x="542" y="532" width="180" height="64"/>
+    <text x="750" y="546" font-size="21" font-weight="700">SW1 · 开发室 1</text>
+    <text x="750" y="572" class="small">24 GE + SFP 管理型交换机</text>
+    <text x="750" y="596" class="small muted">原 16 口 Hub 已退出使用</text>
+    <text x="750" y="618" class="small muted">12 个电口已用 / 12 个电口预留</text>
+  </g>
+
+  <!-- Left building link -->
+  <path d="M522 562H337" class="copper"/>
+  <rect x="352" y="523" width="151" height="54" rx="10" fill="#edf5fb"/>
+  <text x="427" y="545" text-anchor="middle" class="small">50 m · Cat6</text>
+  <text x="427" y="566" text-anchor="middle" class="small muted">Trunk：VLAN 20</text>
+
+  <!-- Right building link -->
+  <path d="M950 562h187" class="fiber"/>
+  <rect x="965" y="518" width="159" height="58" rx="10" fill="#fff5e7"/>
+  <text x="1044" y="541" text-anchor="middle" class="small">500 m · OS2</text>
+  <text x="1044" y="563" text-anchor="middle" class="small muted">1000BASE-LX · VLAN 30</text>
+
+  <!-- SW2 -->
+  <g filter="url(#shadow)">
+    <rect x="78" y="509" width="259" height="124" rx="20" class="card"/>
+    <use href="#switch" x="96" y="533" width="132" height="47"/>
+    <text x="240" y="540" font-size="19" font-weight="700">SW2 · 开发室 2</text>
+    <text x="240" y="565" class="small">16 GE 管理型</text>
+    <text x="240" y="589" class="small muted">11 口已用 / 5 口预留</text>
+    <text x="240" y="612" class="small muted">与开发室 1 同层</text>
+  </g>
+
+  <!-- SW3 -->
+  <g filter="url(#shadow)">
+    <rect x="1137" y="509" width="259" height="124" rx="20" class="card"/>
+    <use href="#switch" x="1153" y="533" width="132" height="47"/>
+    <text x="1288" y="540" font-size="19" font-weight="700">SW3 · 制造部</text>
+    <text x="1288" y="565" class="small">16 GE + SFP</text>
+    <text x="1288" y="589" class="small muted">10 电口 + 1 光口已用</text>
+    <text x="1288" y="612" class="small muted">6 个电口预留</text>
+  </g>
+
+  <!-- Vertical links to PCs -->
+  <path d="M207 633v75" class="copper"/>
+  <path d="M736 633v75" class="copper"/>
+  <path d="M1266 633v75" class="copper"/>
+
+  <!-- PC group 2 -->
+  <g filter="url(#shadow)">
+    <rect x="42" y="708" width="330" height="257" rx="20" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+    <rect x="42" y="708" width="330" height="54" rx="20" fill="#e8f6f2"/>
+    <path d="M42 742h330v20H42z" fill="#e8f6f2"/>
+    <text x="64" y="742" font-size="20" font-weight="700" fill="#0f766e">开发室 2 · 10 台 PC</text>
+    <g color="#0f766e">
+      <use href="#pc" x="68" y="784" width="42" height="38"/><use href="#pc" x="121" y="784" width="42" height="38"/><use href="#pc" x="174" y="784" width="42" height="38"/><use href="#pc" x="227" y="784" width="42" height="38"/><use href="#pc" x="280" y="784" width="42" height="38"/>
+      <use href="#pc" x="68" y="834" width="42" height="38"/><use href="#pc" x="121" y="834" width="42" height="38"/><use href="#pc" x="174" y="834" width="42" height="38"/><use href="#pc" x="227" y="834" width="42" height="38"/><use href="#pc" x="280" y="834" width="42" height="38"/>
+    </g>
+    <text x="64" y="902" class="label" fill="#0f766e">VLAN 20 · 172.18.18.144/28</text>
+    <text x="64" y="927" class="small">PC：.146–.155　网关：.145</text>
+    <text x="64" y="950" class="small muted">掩码：255.255.255.240</text>
+  </g>
+
+  <!-- PC group 1 -->
+  <g filter="url(#shadow)">
+    <rect x="570" y="708" width="330" height="257" rx="20" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+    <rect x="570" y="708" width="330" height="54" rx="20" fill="#eaf1ff"/>
+    <path d="M570 742h330v20H570z" fill="#eaf1ff"/>
+    <text x="592" y="742" font-size="20" font-weight="700" fill="#2563eb">开发室 1 · 10 台 PC</text>
+    <g color="#2563eb">
+      <use href="#pc" x="596" y="784" width="42" height="38"/><use href="#pc" x="649" y="784" width="42" height="38"/><use href="#pc" x="702" y="784" width="42" height="38"/><use href="#pc" x="755" y="784" width="42" height="38"/><use href="#pc" x="808" y="784" width="42" height="38"/>
+      <use href="#pc" x="596" y="834" width="42" height="38"/><use href="#pc" x="649" y="834" width="42" height="38"/><use href="#pc" x="702" y="834" width="42" height="38"/><use href="#pc" x="755" y="834" width="42" height="38"/><use href="#pc" x="808" y="834" width="42" height="38"/>
+    </g>
+    <text x="592" y="902" class="label" fill="#2563eb">VLAN 10 · 172.18.18.128/28</text>
+    <text x="592" y="927" class="small">PC：.130–.139　网关：.129</text>
+    <text x="592" y="950" class="small muted">掩码：255.255.255.240</text>
+  </g>
+
+  <!-- PC group 3 -->
+  <g filter="url(#shadow)">
+    <rect x="1101" y="708" width="330" height="257" rx="20" fill="#fff" stroke="#b45309" stroke-width="2"/>
+    <rect x="1101" y="708" width="330" height="54" rx="20" fill="#fff3e5"/>
+    <path d="M1101 742h330v20H1101z" fill="#fff3e5"/>
+    <text x="1123" y="742" font-size="20" font-weight="700" fill="#b45309">制造部 · 10 台 PC</text>
+    <g color="#b45309">
+      <use href="#pc" x="1127" y="784" width="42" height="38"/><use href="#pc" x="1180" y="784" width="42" height="38"/><use href="#pc" x="1233" y="784" width="42" height="38"/><use href="#pc" x="1286" y="784" width="42" height="38"/><use href="#pc" x="1339" y="784" width="42" height="38"/>
+      <use href="#pc" x="1127" y="834" width="42" height="38"/><use href="#pc" x="1180" y="834" width="42" height="38"/><use href="#pc" x="1233" y="834" width="42" height="38"/><use href="#pc" x="1286" y="834" width="42" height="38"/><use href="#pc" x="1339" y="834" width="42" height="38"/>
+    </g>
+    <text x="1123" y="902" class="label" fill="#b45309">VLAN 30 · 172.18.18.160/28</text>
+    <text x="1123" y="927" class="small">PC：.162–.171　网关：.161</text>
+    <text x="1123" y="950" class="small muted">掩码：255.255.255.240</text>
+  </g>
+
+  <text x="64" y="1007" class="small muted">网关使用路由器 VLAN 子接口；业务网段外保留 172.18.18.176/28 供未来扩展。</text>
+</svg>
