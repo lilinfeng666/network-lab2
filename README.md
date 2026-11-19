@@ -4,8 +4,8 @@
 
 ## 在线提交信息
 
-- 代码仓库：发布远程仓库后填写真实地址
-- 项目 Web 地址：完成公网部署后填写真实地址
+- 代码仓库：[https://github.com/lilinfeng666/network-lab2](https://github.com/lilinfeng666/network-lab2)
+- 项目 Web 地址：[https://37ko2dwsqkkec42pdyi.traesite.cn](https://37ko2dwsqkkec42pdyi.traesite.cn)
 
 > 最终提交时，公网地址不能使用 `localhost`、`127.0.0.1` 或其他仅本机可访问的地址。
 
